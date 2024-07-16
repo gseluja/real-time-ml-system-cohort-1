@@ -195,6 +195,16 @@ files = [
 ]
 
 [[package]]
+name = "jason"
+version = "0.1.7"
+description = "Lightweight helpers for views returning json data in Django."
+optional = false
+python-versions = "*"
+files = [
+    {file = "jason-0.1.7.tar.gz", hash = "sha256:ebb3a47bba158161488ee8ca80f927487b0b3261f80a235f4130bcf438eea454"},
+]
+
+[[package]]
 name = "loguru"
 version = "0.7.2"
 description = "Python logging made (stupidly) simple"
@@ -587,4 +597,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "f7e038918ff07216cb07fa2cbf0477625cf520906051ca146c93e7835bc11623"
+content-hash = "f31bbe9f9b0540132e56d1fddebded3a8e52948da0f5926bd81cbd3c52ecfc32"

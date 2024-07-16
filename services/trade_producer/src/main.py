@@ -8,7 +8,7 @@ from src.kraken_api import KrakenWebsocketTradeAPI
 def produce_trades(
     kafka_broker_address: str,  # Address of the Kafka broker
     kafka_topic_name: str,  # Name of the Kafka topic
-    product_id: str,  # The product ID
+    product_id: list,  # The product ID
     URL: str,  # The URL of the Kraken websocket API, e.g. 'wss://ws.kraken.com'
 ) -> None:
     """
@@ -55,5 +55,5 @@ if __name__ == '__main__':
         kafka_broker_address=config.kafka_broker_address,
         kafka_topic_name=config.kafka_topic_name,
         product_id=config.product_id,
-        URL=config.URL,
+        URL=config.URL_KRAKEN,
     )
