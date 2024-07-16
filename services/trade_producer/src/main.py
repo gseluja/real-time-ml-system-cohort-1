@@ -1,3 +1,4 @@
+import requests
 from loguru import logger
 from quixstreams import Application
 
@@ -5,11 +6,39 @@ from src import config
 from src.kraken_api import KrakenWebsocketTradeAPI
 
 
+# Creates a Kraken product_id from the first_part and second_part of the assets pairs in case of Bitcoin, since
+# the code used in Kraken for BTC is 'XBT'. Otherwise, it takes the wsname from the asset_pairs_url
+def create_kraken_pair(first_part, second_part, wsname):
+    if first_part == 'XBT':
+        base = 'BTC'
+        return f'{base}/{second_part}'
+    else:
+        return f'{ (wsname) }'
+
+
+# Retrieves a list of product_ids (assets pairs) from the specified asset_pairs_url.
+def get_crypto_pairs(asset_pairs_kraken_url: str):
+    pairs = requests.get(asset_pairs_kraken_url).json()['result']
+    crypto_pairs = []
+    parts_length = 4
+
+    for pair, data in pairs.items():
+        if pair[0] == 'X':
+            first_part, second_part = pair[:parts_length], pair[parts_length:]
+            # the currency (FIAT) part is checked to be used with the crypto currency
+            if second_part[0] == 'Z':
+                crypto_pairs.append(
+                    create_kraken_pair(first_part[1:], second_part[1:], data['wsname'])
+                )
+
+    return crypto_pairs
+
+
 def produce_trades(
     kafka_broker_address: str,  # Address of the Kafka broker
     kafka_topic_name: str,  # Name of the Kafka topic
-    product_id: str,  # The product ID
-    URL: str,  # The URL of the Kraken websocket API, e.g. 'wss://ws.kraken.com'
+    product_id: list,  # The products list
+    URL_KRAKEN: str,  # The URL of the Kraken websocket API, e.g. 'wss://ws.kraken.com'
 ) -> None:
     """
     Read trades from the Kraken websocket API and saves them into a Kafka topic.
@@ -27,7 +56,7 @@ def produce_trades(
     # The topic where we will save the trades
     topic = app.topic(name=kafka_topic_name, value_serializer='json')
 
-    kraken_api = KrakenWebsocketTradeAPI(product_id=product_id, URL=URL)
+    kraken_api = KrakenWebsocketTradeAPI(product_id, URL_KRAKEN)
 
     logger.info('Creating the producer...')
 
@@ -54,6 +83,6 @@ if __name__ == '__main__':
     produce_trades(
         kafka_broker_address=config.kafka_broker_address,
         kafka_topic_name=config.kafka_topic_name,
-        product_id=config.product_id,
-        URL=config.URL,
+        product_id=get_crypto_pairs(config.asset_pairs_kraken_url),
+        URL_KRAKEN=config.URL_KRAKEN,
     )
