@@ -32,23 +32,7 @@ class KrakenWebsocketTradeAPI:
         # Let's subscribe to the trades
         msg = {
             'method': 'subscribe',
-            #'params': {'channel': 'trade', 'symbol': [product_id], 'snapshot': False},
-            'params': {
-                'channel': 'trade',
-                'symbol': [
-                    'ETC/USD',
-                    'ETH/USD',
-                    'LTC/USD',
-                    'MLN/USD',
-                    'REP/USD',
-                    'BTC/USD',
-                    'XLM/USD',
-                    'XMR/USD',
-                    'XRP/USD',
-                    'ZEC/USD',
-                ],
-                'snapshot': False,
-            },
+            'params': {'channel': 'trade', 'symbol': product_id, 'snapshot': False},
         }
 
         logger.info(f'Sending message: {json.dumps(msg)}')
@@ -84,17 +68,15 @@ class KrakenWebsocketTradeAPI:
         if 'data' not in message:
             return []
 
-        # logger.info("Message received: ", message)
+        logger.info("Message received: ", message)
 
         message = json.loads(message)
-        # logger.info(message)
 
         # Extract trades from the message['data']
         trades = []
         for trade in message['data']:
             trades.append(
                 {
-                    #'product_id': self.product_id,
                     'product_id': trade['symbol'],
                     'price': trade['price'],
                     'volume': trade['qty'],
