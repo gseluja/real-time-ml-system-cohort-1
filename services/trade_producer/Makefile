@@ -4,7 +4,7 @@ remove:
 build:
 		docker build -t trade-producer .
 
-run: build
+run: remove build
 		docker run -it --network redpanda_network --name trade-producer-image trade-producer
 
 stop:
